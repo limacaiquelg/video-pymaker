@@ -1,2 +1,6 @@
+# Virtual Environment and PyCharm directories
 venv/
 .idea/
+
+# Python Bytecode
+*.pyc
