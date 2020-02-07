@@ -4,3 +4,6 @@ venv/
 
 # Python Bytecode
 *.pyc
+
+# Content
+content/
