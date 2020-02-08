@@ -7,3 +7,6 @@ venv/
 
 # Content
 content/
+
+# APIs Credentials
+credentials/
