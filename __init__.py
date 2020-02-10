@@ -1,8 +1,10 @@
-from robots import input, text
+from robots import input, text, image, state
 
 print('>>>>> Welcome to video-pymaker! <<<<<')
 
-input.robot()
-text.robot()
+# state.delete_content_directory()
+# input.robot()
+# text.robot()
+image.robot()
 
 print('\n>>>>> Thank you for using video-pymaker! <<<<<')
