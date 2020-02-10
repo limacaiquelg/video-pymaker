@@ -1,34 +1,47 @@
 import json
 import os
 
+from helpers import create_new_directory, remove_directory
 from models.Content import Content
 from models.Sentence import Sentence
 
 CONTENT_DIRECTORY = 'content'
-CONTENT_FILE_NAME = 'content.json'
+CONTENT_FILENAME = 'content.json'
 
 
 def save(content: Content):
     content_string = json.dumps(convert_object_to_dict(content), indent=4)
 
-    try:
-        os.mkdir(CONTENT_DIRECTORY)
-    except FileExistsError:
-        print(f'> [State Robot] Directory \'{CONTENT_DIRECTORY}\' already exists.')
+    create_new_directory(CONTENT_DIRECTORY, 'State')
 
-    with open(os.path.join(CONTENT_DIRECTORY, CONTENT_FILE_NAME), 'w') as file:
+    with open(os.path.join(CONTENT_DIRECTORY, CONTENT_FILENAME), 'w') as file:
         file.write(content_string)
 
     print(f'> [State Robot] Content state saved successfully.')
 
 
 def load() -> Content:
-    with open(os.path.join(CONTENT_DIRECTORY, CONTENT_FILE_NAME), 'r') as file:
+    with open(os.path.join(CONTENT_DIRECTORY, CONTENT_FILENAME), 'r') as file:
         content_dict = json.load(file)
 
     content = convert_dict_to_content_object(content_dict)
     print(f'> [State Robot] Content loaded successfully.')
     return content
+
+
+def delete_content_directory():
+    if remove_directory('content', 'State'):
+        print('> [State Robot] Content directory successfully removed.')
+
+
+def delete_images_directory(reset_downloaded_images_list=True):
+    if remove_directory(os.path.join('content', 'images'), 'State'):
+        print('> [State Robot] Images directory successfully removed.')
+
+        if reset_downloaded_images_list:
+            content = load()
+            content.reset_downloaded_images_list()
+            save(content)
 
 
 def convert_object_to_dict(obj):
