@@ -1,5 +1,3 @@
-import json
-import os
 import re
 import nltk
 
@@ -9,26 +7,16 @@ from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson.natural_language_understanding_v1 import Features, KeywordsOptions
 
+from helpers import access_credentials
 from models import Content
 from models.Sentence import Sentence
 from robots import state
 
 
-def algorithmia_api_key() -> str:
-    credentials_directory = 'credentials'
-    algorithmia_file_name = 'algorithmia.json'
-
-    with open(os.path.join(credentials_directory, algorithmia_file_name), 'r') as file:
-        api_key_dict = json.load(file)
-
-    api_key = api_key_dict.get('api_key')
-    return api_key
-
-
 def fetch_content_from_wikipedia(content: Content) -> Content:
     print('> [Text Robot] Fetching content from Wikipedia...')
 
-    algorithmia_client = Algorithmia.client(algorithmia_api_key())
+    algorithmia_client = Algorithmia.client(access_credentials('algorithmia.json', 'api_key'))
     wiki_algorithm = algorithmia_client.algo('web/WikipediaParser/0.1.2')
     wiki_response = wiki_algorithm.pipe(content.search_term)
     wiki_content = wiki_response.result.get('content')
@@ -84,24 +72,13 @@ def break_content_into_sentences(content: Content) -> Content:
     return content
 
 
-def watson_nlu_credentials(key: str) -> str:
-    credentials_directory = 'credentials'
-    watson_nlu_file_name = 'watson-nlu.json'
-
-    with open(os.path.join(credentials_directory, watson_nlu_file_name), 'r') as file:
-        api_key_dict = json.load(file)
-
-    credential = api_key_dict.get(key)
-    return credential
-
-
 def fetch_watson_and_return_keywords(text: str) -> list:
-    authenticator = IAMAuthenticator(watson_nlu_credentials('apikey'))
+    authenticator = IAMAuthenticator(access_credentials('watson-nlu.json', 'apikey'))
     natural_language_understanding = NaturalLanguageUnderstandingV1(
         version='2019-07-12',
         authenticator=authenticator
     )
-    natural_language_understanding.set_service_url(watson_nlu_credentials('url'))
+    natural_language_understanding.set_service_url(access_credentials('watson-nlu.json', 'url'))
 
     watson_response = natural_language_understanding.analyze(
         text=text,
