@@ -10,3 +10,6 @@ content/
 
 # APIs Credentials
 credentials/
+
+# Old Python Scripts (Development)
+*.old.py
