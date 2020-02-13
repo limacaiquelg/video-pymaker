@@ -15,7 +15,9 @@ def fetch_google_and_return_image_links(query: str) -> list:
         cx=access_credentials('google-search.json', 'search-engine-id'),
         searchType='image',
         imgSize='xlarge',
-        num=3
+        num=3,
+        siteSearch='https://www.biography.com/',
+        siteSearchFilter='e'
     ).execute()
 
     return [item.get('link') for item in response.get('items')]
@@ -47,7 +49,7 @@ def fetch_images_of_all_sentences(content: Content) -> Content:
 
 
 def download_and_save(url: str, filename: str) -> bool:
-    output_path = os.path.join('content', 'images', filename)
+    output_path = os.path.join('content', 'images', 'originals', filename)
 
     try:
         image_path = wget.download(url, out=output_path)
@@ -62,12 +64,16 @@ def download_and_save(url: str, filename: str) -> bool:
 
 
 def download_all_images(content: Content) -> Content:
+    content.reset_downloaded_images_list()
     state.delete_images_directory()
 
     print('> [Image Robot] Starting downloading images...')
 
     IMAGES_DIRECTORY = os.path.join('content', 'images')
     create_new_directory(IMAGES_DIRECTORY, 'Image')
+
+    ORIGINAL_IMAGES_DIRECTORY = os.path.join('content', 'images', 'originals')
+    create_new_directory(ORIGINAL_IMAGES_DIRECTORY, 'Image')
 
     for sentence_index, sentence in enumerate(content.sentences):
         images = sentence.images
