@@ -1,4 +1,4 @@
-from robots import input, text, image, state, video
+from robots import state, input, text, image, video, youtube
 
 print('>>>>> Welcome to video-pymaker! <<<<<')
 
@@ -7,5 +7,6 @@ input.robot()
 text.robot()
 image.robot()
 video.robot()
+youtube.robot()
 
 print('\n>>>>> Thank you for using video-pymaker! <<<<<')
