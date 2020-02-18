@@ -132,12 +132,16 @@ def create_youtube_thumbnail():
     print('> [Video Robot] Creating the YouTube Thumbnail...')
 
     INPUT_FILE = os.path.join('content', 'images', 'converted', '0-converted.png')
-    OUTPUT_FILE = os.path.join('content', 'images', 'youtube-thumbnail.png')
+    OUTPUT_FILE_PNG = os.path.join('content', 'images', 'youtube-thumbnail.png')
+    OUTPUT_FILE_JPG = os.path.join('content', 'images', 'youtube-thumbnail.jpg')
 
-    with Image(filename=INPUT_FILE) as youtube_thumbnail:
-        youtube_thumbnail.save(filename=OUTPUT_FILE)
+    with Image(filename=INPUT_FILE) as original:
+        original.save(filename=OUTPUT_FILE_PNG)
 
-    print(f'> [Video Robot] YouTube Thumbnail created: {OUTPUT_FILE}')
+        with original.convert('jpeg') as youtube_thumbnail:
+            youtube_thumbnail.save(filename=OUTPUT_FILE_JPG)
+
+    print(f'> [Video Robot] YouTube Thumbnail created: {OUTPUT_FILE_PNG}')
 
 
 def create_video_initial_images(content: Content):
