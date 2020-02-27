@@ -6,10 +6,15 @@ venv/
 *.pyc
 
 # Content
-content/
+content/images
+content/content.json
+content/output.mp4
 
 # APIs Credentials
-credentials/
+credentials/algorithmia.json
+credentials/client-secrets.json
+credentials/google-search.json
+credentials/watson-nlu.json
 
 # Old Python Scripts (Development)
 *.old.py
