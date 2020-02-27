@@ -25,11 +25,11 @@ For more information on configuring these APIs, please visit this [link](https:/
 
 ## Versions
 
-[Version 1.0](https://github.com/limacaiquelg/video-pymaker/releases/tag/v0.1.0) - Initial Version
+[Version 1.0](https://github.com/limacaiquelg/video-pymaker/releases/tag/v1.0) - Initial Version
 
 ## Authors
 
-| [<img src="https://avatars2.githubusercontent.com/u/17394016?v=3&s=115"><br><br><sub>@limacaiquelg</sub>](https://github.com/limacaiquelg) |
+| [<img src="https://avatars2.githubusercontent.com/u/17394016?v=3&s=115"><br><sub>@limacaiquelg</sub>](https://github.com/limacaiquelg) |
 | :---: |
 
 ## Acknowledgments

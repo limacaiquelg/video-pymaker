@@ -3,7 +3,7 @@
 In this directory are the files with the credentials of the services used by the video-pymaker. In the current version, the following files are required:
 
 ```
-content
+credentials
 │    algorithmia.json
 │    watson-nlu.json
 │    google-search.json
