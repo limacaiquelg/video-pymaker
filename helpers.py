@@ -23,6 +23,11 @@ def create_new_directory(dirname: str, robot: str) -> bool:
         return False
 
 
+def exit_video_pymaker():
+    print('\n>>>>> Thank you for using video-pymaker! <<<<<')
+    exit(1)
+
+
 def remove_directory(dirname: str, robot: str) -> bool:
     try:
         shutil.rmtree(dirname, ignore_errors=True)

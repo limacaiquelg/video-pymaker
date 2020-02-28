@@ -10,6 +10,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError, MediaUploadSizeError
 from googleapiclient.http import MediaFileUpload
 
+from helpers import exit_video_pymaker
 from models.Content import Content
 from robots import state
 
@@ -68,13 +69,13 @@ def resumable_upload(insert_request: googleapiclient.http.HttpRequest) -> str:
                     return response['id']
                 else:
                     raise Exception(f'The upload failed with an unexpected response: {response}.')
-        except HttpError as e:
-            if e.resp.status in RETRIABLE_STATUS_CODES:
-                error = f'A retriable HTTP error {e.resp.status} occurred: \n{e.content}'
+        except HttpError as http_error:
+            if http_error.resp.status in RETRIABLE_STATUS_CODES:
+                error = f'A retriable HTTP error {http_error.resp.status} occurred: \n{http_error.content}'
             else:
                 raise
-        except RETRIABLE_EXCEPTIONS as e:
-            error = f'A retriable error occurred: {e}'
+        except RETRIABLE_EXCEPTIONS as retriable_exception:
+            error = f'A retriable error occurred: {retriable_exception}'
 
         if error is not None:
             print(f'> [YouTube Robot] {error}.')
@@ -122,8 +123,8 @@ def upload_video(content: Content, service: googleapiclient.discovery.Resource) 
         print('> [YouTube Robot] Video upload done!')
 
         return video_id
-    except HttpError as e:
-        print(f'> [YouTube Robot] An HTTP error {e.resp.status} occurred: \n{e.content}.')
+    except HttpError as http_error:
+        print(f'> [YouTube Robot] An HTTP error {http_error.resp.status} occurred: \n{http_error.content}.')
     except Exception as e:
         print(f'> [YouTube Robot] Error: {e}.')
 
@@ -140,8 +141,8 @@ def upload_thumbnail(video_id: str, service: googleapiclient.discovery.Resource)
         ).execute()
 
         print('> [YouTube Robot] The thumbnail was successfully set.')
-    except HttpError as e:
-        if e.resp.status == 403 and e.resp.reason == 'Forbidden':
+    except HttpError as http_error:
+        if http_error.resp.status == 403 and http_error.resp.reason == 'Forbidden':
             print('> [YouTube Robot] Error uploading thumbnail: you must have a verified account to upload custom '
                   'thumbnails.')
         else:
@@ -153,18 +154,16 @@ def upload_thumbnail(video_id: str, service: googleapiclient.discovery.Resource)
 
 
 def robot():
-    print('\n>>> [YouTube Robot] Starting...')
+    try:
+        print('\n>>> [YouTube Robot] Starting...')
+        content = state.load()
 
-    content = state.load()
+        service = get_authenticated_service()
+        video_id = upload_video(content, service)
+        upload_thumbnail(video_id, service)
 
-    service = get_authenticated_service()
-    video_id = upload_video(content, service)
-    upload_thumbnail(video_id, service)
-
-    state.save(content)
-
-    print('>>> [YouTube Robot] Stopping. Work done!')
-
-
-
-
+        state.save(content)
+        print('>>> [YouTube Robot] Stopping. Work done!')
+    except Exception as e:
+        print(f'\n> [YouTube Robot] Unexpected Error: {e}\n')
+        exit_video_pymaker()

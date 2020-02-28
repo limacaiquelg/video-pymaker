@@ -1,11 +1,26 @@
+import json
 import os
 import wget
 
 from googleapiclient.discovery import build
 
-from helpers import create_new_directory, access_credentials
+from helpers import create_new_directory, access_credentials, exit_video_pymaker
 from models import Content
 from robots import state
+
+
+def return_google_search_excluded_sites() -> str:
+    with open(os.path.join('assets', 'google-search-excluded-sites.json'), 'r') as file:
+        sites_dict = json.load(file)
+
+    sites_list = sites_dict.get('sites', None)
+
+    if sites_list:
+        sites_str = ' '.join(sites_list)
+    else:
+        sites_str = ''
+
+    return sites_str
 
 
 def fetch_google_and_return_image_links(query: str) -> list:
@@ -16,7 +31,7 @@ def fetch_google_and_return_image_links(query: str) -> list:
         searchType='image',
         imgSize='xlarge',
         num=3,
-        siteSearch='https://www.biography.com/',
+        siteSearch=return_google_search_excluded_sites(),
         siteSearchFilter='e'
     ).execute()
 
@@ -97,11 +112,15 @@ def download_all_images(content: Content) -> Content:
 
 
 def robot():
-    print('\n>>> [Image Robot] Starting...')
+    try:
+        print('\n>>> [Image Robot] Starting...')
 
-    content = state.load()
-    content = fetch_images_of_all_sentences(content)
-    content = download_all_images(content)
-    state.save(content)
+        content = state.load()
+        content = fetch_images_of_all_sentences(content)
+        content = download_all_images(content)
+        state.save(content)
 
-    print('>>> [Image Robot] Stopping. Work done!')
+        print('>>> [Image Robot] Stopping. Work done!')
+    except Exception as e:
+        print(f'\n> [Image Robot] Unexpected Error: {e}\n')
+        exit_video_pymaker()

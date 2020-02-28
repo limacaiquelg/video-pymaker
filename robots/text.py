@@ -7,7 +7,7 @@ from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson.natural_language_understanding_v1 import Features, KeywordsOptions
 
-from helpers import access_credentials
+from helpers import access_credentials, exit_video_pymaker
 from models import Content
 from models.Sentence import Sentence
 from robots import state
@@ -104,13 +104,23 @@ def fetch_keywords_of_all_sentences(content: Content) -> Content:
 
 
 def robot():
-    print('\n>>> [Text Robot] Starting...')
+    try:
+        print('\n>>> [Text Robot] Starting...')
+        content = state.load()
 
-    content = state.load()
-    content = fetch_content_from_wikipedia(content)
-    content = sanitize_content(content)
-    content = break_content_into_sentences(content)
-    content = fetch_keywords_of_all_sentences(content)
-    state.save(content)
+        content = fetch_content_from_wikipedia(content)
+        content = sanitize_content(content)
+        content = break_content_into_sentences(content)
+        content = fetch_keywords_of_all_sentences(content)
 
-    print('>>> [Text Robot] Stopping. Work done!')
+        state.save(content)
+        print('>>> [Text Robot] Stopping. Work done!')
+    except Algorithmia.errors.AlgorithmException as algorithm_exception:
+        print(f'\n> [Text Robot] Error: video-pymaker was unable to fetch Wikipedia with this search term:',
+              f'{content.search_term}.')
+        print(f'> [Text Robot] See Algorithmia error below: ')
+        print(f'> [Text Robot] Algorithmia Error: {algorithm_exception}')
+        exit_video_pymaker()
+    except Exception as e:
+        print(f'\n> [Text Robot] Unexpected Error: {e}\n')
+        exit_video_pymaker()

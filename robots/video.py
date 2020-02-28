@@ -11,7 +11,7 @@ from wand.exceptions import BaseError
 from wand.font import Font
 from wand.image import Image
 
-from helpers import create_new_directory
+from helpers import create_new_directory, exit_video_pymaker
 from models import Content
 from robots import state
 
@@ -43,8 +43,8 @@ def convert_image(sentence_index: int):
 
             print(f'> [Video Robot] Image converted: {OUTPUT_FILE}')
 
-    except BaseError as e:
-        print(f'> [Video Robot] Error converting image: {e}')
+    except BaseError as base_error:
+        print(f'> [Video Robot] Error converting image: {base_error}')
 
 
 def convert_all_images(content: Content):
@@ -254,14 +254,18 @@ def create_video_with_moviepy():
 
 
 def robot():
-    print('\n>>> [Video Robot] Starting...')
+    try:
+        print('\n>>> [Video Robot] Starting...')
+        content = state.load()
 
-    content = state.load()
-    convert_all_images(content)
-    create_all_sentences_images(content)
-    create_youtube_thumbnail()
-    create_video_initial_images(content)
-    create_video_with_moviepy()
-    state.save(content)
+        convert_all_images(content)
+        create_all_sentences_images(content)
+        create_youtube_thumbnail()
+        create_video_initial_images(content)
+        create_video_with_moviepy()
 
-    print('>>> [Video Robot] Stopping. Work done!')
+        state.save(content)
+        print('>>> [Video Robot] Stopping. Work done!')
+    except Exception as e:
+        print(f'\n> [Video Robot] Unexpected Error: {e}\n')
+        exit_video_pymaker()
